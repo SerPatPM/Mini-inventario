@@ -1,0 +1,13 @@
+package com.ipn.mx.miinventario.features.categoria.service.impl;
+
+import com.ipn.mx.miniinventario.core.entidades.Categoria;
+
+@service
+public class CategoriaServiceImpl implements CategoriaService{
+    @Autowired
+    private CategoriaDAO categoriaRepository;
+    //@Transactional del tipo SpringBoot Only Read
+    //Implementar todos los métodos de CAtegoriaService
+
+
+}
