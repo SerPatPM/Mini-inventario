@@ -1,0 +1,11 @@
+services:
+  postgresql:
+    image: postgres #Without version, automatically pulls the latest version of the image
+    container_name: "4bm2postgresqlDocker"
+    restart: always
+    environment:
+      POSTGRES_DB: "testdb"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+    ports:
+      - "5173:5432"
