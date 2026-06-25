@@ -2,7 +2,6 @@ package com.ipn.mx.miniinventario.features.producto.controller;
 import com.ipn.mx.miniinventario.core.entidades.Categoria;
 import com.ipn.mx.miniinventario.core.entidades.Producto;
 import com.ipn.mx.miniinventario.features.categoria.service.CategoriaService;
-import com.ipn.mx.miniinventario.features.mail.service.EmailService;
 import com.ipn.mx.miniinventario.features.producto.DTOs.ProductoCreateDTO;
 import com.ipn.mx.miniinventario.features.producto.service.ProductoService;
 import jakarta.validation.Valid;
@@ -18,16 +17,10 @@ public class ProductoController {
     private ProductoService productoService;
     @Autowired
     private CategoriaService categoriaService;
-    @Autowired
-    private EmailService emailService;
 
     @GetMapping("/producto")
     @ResponseStatus(HttpStatus.OK)
     public List<Producto> findAll(){
-        emailService.enviarCorreoElectronico(
-                "melanie.acbe@gmail.com", "Jajajja Ahuevo que pedo pinche mmd toca rara",
-                "En mis tiempos esa wea era bn complicada puto Kike t voi a odiar hasta la muerte, viva zarate"
-        );
         return productoService.findAll();
     }
 
