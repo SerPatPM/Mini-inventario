@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniInventario · Control de stock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="manifest-header">
+    <div class="brand">
+      <span class="stamp" aria-hidden="true">MI</span>
+      <div class="brand-text">
+        <h1>MiniInventario</h1>
+        <p>Folio de productos, categorías y archivos</p>
+      </div>
+    </div>
+
+    <div class="conn-wrap">
+      <button class="conn-pill" id="connPill" type="button" aria-expanded="false">
+        <span class="conn-dot" id="connDot"></span>
+        <span id="connLabel">Verificando conexión</span>
+      </button>
+      <div class="conn-popover" id="connPopover" hidden>
+        <label for="apiBaseInput">URL de la API</label>
+        <input type="text" id="apiBaseInput" placeholder="http://localhost:8085" autocomplete="off" spellcheck="false">
+        <p class="conn-hint">Cambia esto cuando despliegues el backend en Render. Se guarda en este navegador.</p>
+        <div class="conn-actions">
+          <button type="button" class="btn-ghost" id="btnConnCancel">Cancelar</button>
+          <button type="button" class="btn-primary" id="btnConnSave">Guardar y probar</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tag-nav" id="tagNav" role="tablist">
+    <button class="tag-tab active" data-section="productos" role="tab" aria-selected="true">
+      <span class="punch" aria-hidden="true"></span>Productos
+    </button>
+    <button class="tag-tab" data-section="categorias" role="tab" aria-selected="false">
+      <span class="punch" aria-hidden="true"></span>Categorías
+    </button>
+    <button class="tag-tab" data-section="archivos" role="tab" aria-selected="false">
+      <span class="punch" aria-hidden="true"></span>Archivos
+    </button>
+  </nav>
+
+  <main class="content">
+
+    <!-- PRODUCTOS -->
+    <section class="panel-section active" id="section-productos" role="tabpanel">
+      <div class="toolbar">
+        <div>
+          <h2>Productos</h2>
+          <p class="section-sub">Existencia y precio por artículo</p>
+        </div>
+        <button class="btn-primary" id="btnNuevoProducto" type="button">Nuevo producto</button>
+      </div>
+
+      <div class="banner banner-error" id="bannerProductos" hidden></div>
+
+      <div class="table-wrap">
+        <table class="ledger" id="tableProductos">
+          <thead>
+            <tr>
+              <th class="col-id">Folio</th>
+              <th>Nombre</th>
+              <th>Categoría</th>
+              <th class="col-num">Precio</th>
+              <th class="col-num">Existencia</th>
+              <th class="col-date">Alta</th>
+              <th class="col-actions"></th>
+            </tr>
+          </thead>
+          <tbody id="bodyProductos"></tbody>
+        </table>
+      </div>
+      <p class="empty-state" id="emptyProductos" hidden>No hay productos registrados. Usa "Nuevo producto" para abrir el primero.</p>
+      <p class="loading-state" id="loadingProductos">Cargando productos…</p>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section class="panel-section" id="section-categorias" role="tabpanel">
+      <div class="toolbar">
+        <div>
+          <h2>Categorías</h2>
+          <p class="section-sub">Clasificación que agrupa a los productos</p>
+        </div>
+        <button class="btn-primary" id="btnNuevaCategoria" type="button">Nueva categoría</button>
+      </div>
+
+      <div class="banner banner-error" id="bannerCategorias" hidden></div>
+
+      <div class="table-wrap">
+        <table class="ledger" id="tableCategorias">
+          <thead>
+            <tr>
+              <th class="col-id">Folio</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th class="col-date">Alta</th>
+              <th class="col-actions"></th>
+            </tr>
+          </thead>
+          <tbody id="bodyCategorias"></tbody>
+        </table>
+      </div>
+      <p class="empty-state" id="emptyCategorias" hidden>No hay categorías registradas. Crea la primera antes de dar de alta productos.</p>
+      <p class="loading-state" id="loadingCategorias">Cargando categorías…</p>
+    </section>
+
+    <!-- ARCHIVOS -->
+    <section class="panel-section" id="section-archivos" role="tabpanel">
+      <div class="toolbar">
+        <div>
+          <h2>Archivos</h2>
+          <p class="section-sub">Documentos guardados directamente en la base de datos</p>
+        </div>
+      </div>
+
+      <div class="banner banner-info">
+        Esta API guarda el archivo pero no regresa su folio al subirlo, y no expone un listado de archivos guardados. Anota el folio por tu cuenta si necesitas descargarlo después.
+      </div>
+
+      <div class="archivo-grid">
+        <div class="dropzone-card">
+          <h3>Subir archivo</h3>
+          <label class="dropzone" id="dropzone" for="fileInput">
+            <input type="file" id="fileInput" hidden>
+            <span class="dropzone-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 16V4M12 4L7 9M12 4L17 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </span>
+            <span class="dropzone-text" id="dropzoneText">Arrastra un archivo o haz clic para elegirlo</span>
+          </label>
+          <button class="btn-primary" id="btnSubirArchivo" type="button" disabled>Guardar en base de datos</button>
+          <p class="field-hint" id="archivoStatus"></p>
+        </div>
+
+        <div class="dropzone-card">
+          <h3>Descargar por folio</h3>
+          <p class="field-hint">Si ya conoces el folio del archivo (ej. consultándolo en Supabase), descárgalo aquí.</p>
+          <div class="inline-form">
+            <input type="number" id="descargaIdInput" placeholder="Folio del archivo" min="1">
+            <button class="btn-secondary" id="btnDescargarArchivo" type="button">Descargar</button>
+          </div>
+          <p class="field-hint" id="descargaStatus"></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Panel lateral (formularios) -->
+<div class="overlay" id="overlay" hidden></div>
+<aside class="tag-panel" id="tagPanel" aria-hidden="true">
+  <div class="tag-panel-edge" aria-hidden="true"></div>
+  <div class="tag-panel-body">
+    <div class="tag-panel-head">
+      <h3 id="panelTitle">Nuevo producto</h3>
+      <button class="icon-btn" id="panelClose" type="button" aria-label="Cerrar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <form id="panelForm" novalidate></form>
+  </div>
+</aside>
+
+<div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
